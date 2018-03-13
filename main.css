@@ -1,0 +1,83 @@
+*,
+*:before,
+*:after {
+	box-sizing: border-box;
+}
+
+body {
+	padding: 20px;
+	font-family: Verdana, serif;
+	font-size: 14px;
+}
+
+.game-wrapper {
+	position: relative;
+}
+
+.canvas {
+	font-size: 0;
+}
+
+.tile {
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    position: absolute;
+    background-position: bottom right;
+    background-repeat: no-repeat;
+    background-size: 100%;
+}
+
+.player {
+	width: 32px;
+	height: 32px;
+	position: absolute;
+	z-index: 99;
+	transition: left 0.15s ease, top 0.15s ease;
+}
+
+.player .player-name {
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+	transform: translateX(-50%);
+	color: #fff;
+	font-weight: bold;
+	font-size: 12px;
+	text-shadow: 1px 1px rgba(0, 0, 0, 1);
+}
+
+.player:before {
+	content: '';
+	background: white;
+	border: 2px solid #000;
+	border-radius: 50%;
+	box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+	width: 28px;
+	height: 28px;
+	display: block;
+}
+
+.player-inventory {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 20px;
+	margin: 10px;
+	background: #eee;
+	line-height: 32px;
+}
+
+.player-inventory:before {
+	content: 'Items:';
+	color: #000;
+}
+
+.player-item {
+	display: inline-block;
+	width: 32px;
+	height: 32px;
+	margin-right: 10px;
+	background-size: 100%;
+}
