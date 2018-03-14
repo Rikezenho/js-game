@@ -1,4 +1,4 @@
-const globalMap = [
+let walkableTiles = [
     {
 		x: 0,
 		y: 0,
@@ -28,13 +28,6 @@ const globalMap = [
 		x: 2,
 		y: 1,
 		type: tiles.grass,
-    },
-    {
-		x: 1,
-		y: 1,
-		zIndex: 1,
-		notWalkable: true,
-		type: items.trunk,
     },
     {
 		x: 0,
@@ -77,6 +70,15 @@ const globalMap = [
 		y: 2,
 		type: tiles.grass,
 	},
+];
+
+let itemTiles = [
+	{
+		x: 1,
+		y: 1,
+		zIndex: 1,
+		type: items.trunk,
+    },
     {
 		x: 7,
 		y: 2,
@@ -88,71 +90,63 @@ const globalMap = [
 		},
 		type: items.necklace,
 	},
-
-	// water
-	{
-		x: 3,
-		y: 0,
-		notWalkable: true,
-		type: tiles.water,
-	},
-    {
-		x: 3,
-		y: 1,
-		notWalkable: true,
-		type: tiles.water,
-    },
-
-	{
-		x: 4,
-		y: 0,
-		notWalkable: true,
-		type: tiles.water,
-	},
-    {
-		x: 4,
-		y: 1,
-		notWalkable: true,
-		type: tiles.water,
-    },
-
-	{
-		x: 5,
-		y: 0,
-		notWalkable: true,
-		type: tiles.water,
-	},
-    {
-		x: 5,
-		y: 1,
-		notWalkable: true,
-		type: tiles.water,
-    },
-
-	{
-		x: 6,
-		y: 0,
-		notWalkable: true,
-		type: tiles.water,
-	},
-    {
-		x: 6,
-		y: 1,
-		notWalkable: true,
-		type: tiles.water,
-    },
-
-	{
-		x: 7,
-		y: 0,
-		notWalkable: true,
-		type: tiles.water,
-	},
-    {
-		x: 7,
-		y: 1,
-		notWalkable: true,
-		type: tiles.water,
-    },
-
 ];
+
+let notWalkableTiles = [
+	{
+		x: 3,
+		y: 0,
+		type: tiles.water,
+	},
+    {
+		x: 3,
+		y: 1,
+		type: tiles.water,
+    },
+
+	{
+		x: 4,
+		y: 0,
+		type: tiles.water,
+	},
+    {
+		x: 4,
+		y: 1,
+		type: tiles.water,
+    },
+
+	{
+		x: 5,
+		y: 0,
+		type: tiles.water,
+	},
+    {
+		x: 5,
+		y: 1,
+		type: tiles.water,
+    },
+
+	{
+		x: 6,
+		y: 0,
+		type: tiles.water,
+	},
+    {
+		x: 6,
+		y: 1,
+		type: tiles.water,
+    },
+
+	{
+		x: 7,
+		y: 0,
+		type: tiles.water,
+	},
+    {
+		x: 7,
+		y: 1,
+		type: tiles.water,
+    },
+];
+
+let globalMap = [].concat(walkableTiles, notWalkableTiles, itemTiles);

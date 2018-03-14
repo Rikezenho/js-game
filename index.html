@@ -4,15 +4,20 @@
     <meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
 	<link rel="stylesheet" href="main.css"/>
-    <title>JS Bin</title>
+    <title>JS Game</title>
 </head>
 <body>
 
+	<div class="initGame-wrapper">
+		<a href="#" class="preMapStart">Mapa pré-definido</a>
+		<a href="#" class="randomMapStart">Mapa randômico (20x15)</a>
+	</div>
 	<div class="game-wrapper">
 		<div class="player-inventory"></div>
 		<div class="canvas"></div>
 	</div>
 	<script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+	<script src="https://cdn.jsdelivr.net/lodash/4/lodash.min.js"></script>
 	<script src="world/tiles.js"></script>
 	<script src="world/items.js"></script>
 	<script src="world/map.js"></script>

@@ -1,0 +1,15 @@
+{
+	"scripts": {
+		"dev": "live-server"
+	},
+	"dependencies": {
+		"live-server": "^1.2.0"
+	},
+	"name": "js-game",
+	"version": "1.0.0",
+	"description": "Simple JS 2d game with JavaScript and ES6.",
+	"main": "index.js",
+	"repository": "https://github.com/Rikezenho/js-game.git",
+	"author": "Henrique Kuwai <eu@henriquekuwai.com.br>",
+	"license": "MIT"
+}

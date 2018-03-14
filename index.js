@@ -6,7 +6,7 @@ const $document = $(document);
 const $body = $('body');
 
 const Utils = {
-	backgroundToStyle: (element) => {
+	backgroundToStyle: (element = {}) => {
 		let addStyle = '';
 		if (element.backgroundColor) {
 			addStyle += `background-color: ${element.backgroundColor};`;
@@ -19,22 +19,70 @@ const Utils = {
 };
 
 class WorldMap {
-	constructor() {
+	constructor(options = {}) {
 		this.defaults = {
 			zIndex: 0,
 			tileSize: 32
 		};
 
+		if (options.random) {
+			this.currentMap = this.generateRandomMap(40, 15);
+		} else {
+			this.currentMap = globalMap;
+		}
+
 		this.renderMap();
+	}
+
+	generateRandomMap(width, height) {
+		let finalMap = []; // primeiro square sempre andável
+		let firstTile = true;
+
+		xloop:
+		for (let counterX = 0; counterX < width; counterX++) {
+
+			yloop:
+			for (let counterY = 0; counterY < height; counterY++) {
+				if (firstTile) {
+					finalMap[finalMap.length] = {
+						x: 0,
+						y: 0,
+						type: tiles.grass,
+					};
+					firstTile = false;
+				} else {
+					finalMap[finalMap.length] = {
+						x: counterX,
+						y: counterY,
+						type: false,
+					};
+				}
+			}
+
+		}
+
+		// to-do: inteligência para sempre criar caminhos andáveis
+		let tilesKeys = Object.keys(tiles);
+
+		for (let i = 0; i < finalMap.length; i++) {
+			if (!finalMap[i].type) {
+				let randomTile = tilesKeys[Math.floor(Math.random() * tilesKeys.length)];
+				finalMap[i].type = tiles[randomTile];
+			}
+		}
+
+		return finalMap;
 	}
 
 	renderMap() {
 		$canvas.html('');
-		globalMap.map((el) => {
+
+		this.currentMap.map((el) => {
 			let x = el.x * this.defaults.tileSize;
 			let y = el.y * this.defaults.tileSize;
 			let zIndex = el.zIndex || this.defaults.zIndex;
-			let type = el.type;
+
+			let tile = el.type;
 			let addStyle = Utils.backgroundToStyle(el.type);
 
 			$canvas.append(`
@@ -46,7 +94,7 @@ class WorldMap {
 
 
 	hasTile(pos) {
-		const findTile = globalMap.filter((el) => {
+		const findTile = this.currentMap.filter((el) => {
 			return (el.x == pos.x && el.y == pos.y);
 		});
 
@@ -58,12 +106,11 @@ class WorldMap {
 	}
 
 	hasItem(pos) {
-		const findItems = globalMap.filter((el) => {
+		const findItems = this.currentMap.filter((el) => {
 			return (el.x == pos.x && el.y == pos.y && el.isItem == true);
 		});
 
 		if (findItems.length) {
-			console.log(findItems);
 			for (let i = 0; i < findItems.length; i++) {
 				if (typeof findItems[i].onReach === 'function') {
 					findItems[i].onReach(pos);
@@ -78,25 +125,25 @@ class WorldMap {
 
 	removeItem(pos, item) {
 		let findIndex = -1;
-		const findTile = globalMap.filter((el, index) => {
-			var condition = (el.x == pos.x && el.y == pos.y && el.type == item);
+		const findTile = this.currentMap.filter((el, index) => {
+			var condition = (el.x == pos.x && el.y == pos.y && (el.type || {}) == item);
 			if (condition) {
 				findIndex = index;
 			}
 			return condition;
 		});
 		if (findTile.length) {
-			globalMap.splice(findIndex,1);
+			this.currentMap.splice(findIndex, 1);
 		}
 		this.renderMap();
 	}
 
 	isWalkable(pos) {
-		const findBlock = globalMap.filter((el) => {
-			return (el.x == pos.x && el.y == pos.y && el.notWalkable);
+		const findNotWalkable = this.currentMap.filter((el) => {
+			return (el.x == pos.x && el.y == pos.y && (el.type || {}).notWalkable);
 		});
 
-		if (findBlock.length) {
+		if (findNotWalkable.length) {
 			return false;
 		} else {
 			return true;
@@ -116,6 +163,7 @@ class Player {
 			y: (options.position || {}).y || 0,
 		};
 		this.items = [];
+		this.isOnMovement = false;
 
 		this.movePlayer(this.position);
 		this.renderInventory();
@@ -158,24 +206,29 @@ class Player {
 		}
 		this.$player = $('.player');
 
-		const newPosition = {
-			x: pos.x,
-			y: pos.y,
-		};
+		if (!this.isOnMovement) {
+			const newPosition = {
+				x: pos.x,
+				y: pos.y,
+			};
 
-		if (!worldMap.hasTile(newPosition) || !worldMap.isWalkable(newPosition)) {
-			return false;
-		};
+			if (!worldMap.hasTile(newPosition) || !worldMap.isWalkable(newPosition)) {
+				return false;
+			};
 
-		worldMap.hasItem(newPosition);
+			worldMap.hasItem(newPosition);
 
-		if (newPosition.x !== this.position.x) this.position.x = newPosition.x;
-		if (newPosition.y !== this.position.y) this.position.y = newPosition.y;
+			this.isOnMovement = true;
 
-		this.$player.css({
-			top: this.position.y * worldMap.defaults.tileSize,
-			left: this.position.x * worldMap.defaults.tileSize,
-		});
+			if (newPosition.x !== this.position.x) this.position.x = newPosition.x;
+			if (newPosition.y !== this.position.y) this.position.y = newPosition.y;
+
+			this.$player.css({
+				top: this.position.y * worldMap.defaults.tileSize,
+				left: this.position.x * worldMap.defaults.tileSize,
+			});
+			this.isOnMovement = false;
+		}
 	}
 
 	addItem(item) {
@@ -196,7 +249,30 @@ class Player {
 	}
 }
 
-window.worldMap = new WorldMap();
-window.player = new Player({
-	name: 'Teste'
+document.querySelector('.preMapStart').addEventListener('click', (e) => {
+	e.preventDefault();
+
+	window.worldMap = new WorldMap();
+	window.player = new Player({
+		name: 'Teste',
+		position: {
+			x: 0,
+			y: 0,
+		},
+	});
+});
+
+document.querySelector('.randomMapStart').addEventListener('click', (e) => {
+	e.preventDefault();
+
+	window.worldMap = new WorldMap({
+		random: true,
+	});
+	window.player = new Player({
+		name: 'Teste',
+		position: {
+			x: 0,
+			y: 0,
+		},
+	});
 });

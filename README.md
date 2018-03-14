@@ -2,6 +2,13 @@
 
 Little JS game for studying.
 
+---
+
+- Install packages using `yarn` or `npm install`
+- Run `live-server`.
+
+---
+
 ### Limitations
 
 - Only for ECMAScript2015+ support browsers.
@@ -10,6 +17,7 @@ Little JS game for studying.
 
 - Walkable character with name
 - Map with X and Y axis - JSON based
+- Random map generating
 - JSON configuration for items
 - JSON configuration for map tiles
 - Stacking tiles
