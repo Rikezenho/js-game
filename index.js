@@ -71,7 +71,7 @@ class WorldMap {
 
 		for (let i = 0; i < finalMap.length; i++) {
 			if (!finalMap[i].type) {
-				let randomTile = tilesKeys[Math.floor(Math.random() * tilesKeys.length)];
+				let randomTile = tilesKeys[Utils.getRandomInt(0, tilesKeys.length)];
 				finalMap[i].type = tiles[randomTile];
 			}
 		}
@@ -83,22 +83,27 @@ class WorldMap {
 			const tileDown = finalMap.filter(el => el.x === x && el.y === y + 1);
 			const tileLeft = finalMap.filter(el => el.x === x - 1 && el.y === y);
 			const tilesOnSides = [tileUp, tileRight, tileDown, tileLeft];
-			const onlyRealTiles = tilesOnSides.filter((tile) => tile.length);
+			const onlyRealTilesOnSides = tilesOnSides.filter((tile) => tile.length);
 
 			let hasAtLeastOneWalkableTileOnSides = false;
 
-			for (let i = 0; i < onlyRealTiles.length; i++) {
-				if (onlyRealTiles[i] && onlyRealTiles[i].type && !onlyRealTiles[i].type.notWalkable) {
+			for (let i = 0; i < onlyRealTilesOnSides.length; i++) {
+				if (onlyRealTilesOnSides[i] && onlyRealTilesOnSides[i].type && !onlyRealTilesOnSides[i].type.notWalkable) {
 					hasAtLeastOneWalkableTileOnSides = true;
 				}
 			}
 
 			if (!hasAtLeastOneWalkableTileOnSides) {
-				const getOneOfThem = Utils.getRandomInt(0, onlyRealTiles.length);
-				const onlyWalkableTypes = tilesKeys.filter((thisTile) => !tiles[thisTile].notWalkable);
-				const randomTile = onlyWalkableTypes[Math.floor(Math.random() * onlyWalkableTypes.length)];
+				const getOneOfThem = Utils.getRandomInt(0, onlyRealTilesOnSides.length);
 
-				onlyRealTiles[getOneOfThem].type = onlyWalkableTypes[randomTile];
+				const onlyWalkableTypes = tilesKeys.filter((thisTile) => !tiles[thisTile].notWalkable);
+				const randomWalkableType = onlyWalkableTypes[Utils.getRandomInt(0, onlyWalkableTypes.length)];
+
+				const getFinalX = onlyRealTilesOnSides[getOneOfThem][0].x;
+				const getFinalY = onlyRealTilesOnSides[getOneOfThem][0].y;
+				const getMapFinalTile = finalMap.filter(el => el.x === getFinalX && el.y === getFinalY);
+
+				getMapFinalTile[0].type = tiles[randomWalkableType];
 			}
 		});
 
