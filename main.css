@@ -8,6 +8,7 @@ body {
 	padding: 20px;
 	font-family: Verdana, serif;
 	font-size: 14px;
+	overflow: hidden;
 }
 
 a {

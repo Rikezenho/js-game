@@ -6,7 +6,7 @@ const $document = $(document);
 const $body = $('body');
 
 const Utils = {
-	backgroundToStyle: (element = {}) => {
+	backgroundToStyle(element = {}) {
 		let addStyle = '';
 		if (element.backgroundColor) {
 			addStyle += `background-color: ${element.backgroundColor};`;
@@ -15,6 +15,11 @@ const Utils = {
 			addStyle += `background-image: url(${element.backgroundImage});`;
 		}
 		return addStyle;
+	},
+	getRandomInt(min, max) {
+		min = Math.ceil(min);
+		max = Math.floor(max);
+		return Math.floor(Math.random() * (max - min)) + min;
 	}
 };
 
@@ -35,8 +40,8 @@ class WorldMap {
 	}
 
 	generateRandomMap(width, height) {
-		let finalMap = []; // primeiro square sempre andável
-		let firstTile = true;
+		let finalMap = [];
+		let firstTile = true; // primeiro square sempre andável
 
 		xloop:
 		for (let counterX = 0; counterX < width; counterX++) {
@@ -70,6 +75,32 @@ class WorldMap {
 				finalMap[i].type = tiles[randomTile];
 			}
 		}
+
+		finalMap.forEach((tile) => {
+			const { x, y } = tile;
+			const tileUp = finalMap.filter(el => el.x === x && el.y === y - 1);
+			const tileRight = finalMap.filter(el => el.x === x + 1 && el.y === y);
+			const tileDown = finalMap.filter(el => el.x === x && el.y === y + 1);
+			const tileLeft = finalMap.filter(el => el.x === x - 1 && el.y === y);
+			const tilesOnSides = [tileUp, tileRight, tileDown, tileLeft];
+			const onlyRealTiles = tilesOnSides.filter((tile) => tile.length);
+
+			let hasAtLeastOneWalkableTileOnSides = false;
+
+			for (let i = 0; i < onlyRealTiles.length; i++) {
+				if (onlyRealTiles[i] && onlyRealTiles[i].type && !onlyRealTiles[i].type.notWalkable) {
+					hasAtLeastOneWalkableTileOnSides = true;
+				}
+			}
+
+			if (!hasAtLeastOneWalkableTileOnSides) {
+				const getOneOfThem = Utils.getRandomInt(0, onlyRealTiles.length);
+				const onlyWalkableTypes = tilesKeys.filter((thisTile) => !tiles[thisTile].notWalkable);
+				const randomTile = onlyWalkableTypes[Math.floor(Math.random() * onlyWalkableTypes.length)];
+
+				onlyRealTiles[getOneOfThem].type = onlyWalkableTypes[randomTile];
+			}
+		});
 
 		return finalMap;
 	}
@@ -171,7 +202,7 @@ class Player {
 	}
 
 	listeners() {
-		$window.on('keyup', (e) => {
+		$window.on('keydown', (e) => {
 			if (e.keyCode == 37) { // left
 				this.movePlayer({
 					x: this.position.x - 1,
@@ -238,6 +269,9 @@ class Player {
 	}
 
 	renderInventory() {
+		if (!this.items.length) {
+			this.$inventory.html('');
+		}
 		for (let i = 0; i < this.items.length; i++) {
 			let item = this.items[i];
 			let addStyle = Utils.backgroundToStyle(item);
